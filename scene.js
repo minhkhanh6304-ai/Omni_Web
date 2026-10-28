@@ -6,7 +6,20 @@ const animated=[], pointer=new THREE.Vector2(), target=new THREE.Vector2();
 function setMotion(value){paused=!value;motion.setAttribute('aria-pressed',String(value));motion.setAttribute('aria-label',value?'Tắt chuyển động 3D':'Bật chuyển động 3D');motion.textContent=value?'Ⅱ':'▷';document.body.classList.toggle('motion-paused',!value);if(value)kick();else draw(performance.now());}
 motion.addEventListener('click',()=>setMotion(paused));reduce.addEventListener('change',e=>setMotion(!e.matches));
 function studioEnvironment(){const c=document.createElement('canvas');c.width=1024;c.height=512;const ctx=c.getContext('2d'),g=ctx.createLinearGradient(0,0,0,512);g.addColorStop(0,'#eee0df');g.addColorStop(.43,'#d7bdcd');g.addColorStop(.5,'#897c91');g.addColorStop(.64,'#dbb3bc');g.addColorStop(1,'#ead6c2');ctx.fillStyle=g;ctx.fillRect(0,0,1024,512);ctx.fillStyle='#fff9ec';ctx.fillRect(60,40,115,185);ctx.fillRect(580,60,200,150);ctx.fillStyle='#423444';ctx.fillRect(270,230,80,140);ctx.fillStyle='#fff8f6';ctx.fillRect(840,150,35,180);const t=new THREE.CanvasTexture(c);t.mapping=THREE.EquirectangularReflectionMapping;t.colorSpace=THREE.SRGBColorSpace;return t;}
-function labelTexture(){const c=document.createElement('canvas');c.width=512;c.height=512;const ctx=c.getContext('2d');ctx.fillStyle='#735268d9';ctx.beginPath();ctx.roundRect(28,22,456,460,26);ctx.fill();ctx.strokeStyle='#edccd49c';ctx.lineWidth=2;ctx.stroke();ctx.fillStyle='#f8e6eb';ctx.textAlign='center';ctx.font='25px Georgia';ctx.fillText('✧',256,92);ctx.font='italic 68px Georgia';ctx.fillText('creative',256,210);ctx.fillText('essence.',256,276);ctx.font='14px sans-serif';ctx.fillText('THE GROWTH COLLECTION',256,365);ctx.font='13px sans-serif';ctx.fillText('IDEAS INTO IMPACT   /   30 ML',256,400);const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;return t;}
+function labelTexture(){
+  const c=document.createElement('canvas');c.width=1024;c.height=1024;const ctx=c.getContext('2d');
+  ctx.fillStyle='#fffdfb';ctx.fillRect(0,0,1024,1024);
+  ctx.fillStyle='#39302c';ctx.textAlign='left';ctx.font='24px Arial';
+  ctx.fillText('Dedicated to',180,96);ctx.fillText('real results',180,128);
+  const goldInk=ctx.createLinearGradient(160,280,820,365);goldInk.addColorStop(0,'#c6ae77');goldInk.addColorStop(.25,'#8c673a');goldInk.addColorStop(.5,'#d3bc88');goldInk.addColorStop(.8,'#9b723d');goldInk.addColorStop(1,'#c6a66a');
+  ctx.fillStyle=goldInk;ctx.font='100px Arial';ctx.fillText('medicube',163,375);ctx.font='55px Arial';ctx.fillText('⁺',765,332);
+  ctx.fillStyle='#302b2a';ctx.font='34px Arial';ctx.fillText('PDRN PINK',182,491);ctx.fillText('PEPTIDE SERUM',182,539);
+  ctx.strokeStyle='#d4beb6';ctx.lineWidth=2;ctx.strokeRect(180,587,614,48);ctx.strokeRect(180,650,614,48);
+  ctx.fillStyle='#b89991';ctx.font='23px Arial';ctx.fillText('PDRN (Sodium DNA) 1%',199,619);ctx.fillText('5 Types Peptide Complex',199,683);
+  ctx.fillStyle='#39302c';ctx.font='27px Arial';ctx.fillText('30 ml / 1.01 fl. oz.',182,781);
+  ctx.fillStyle='#edbcc6';ctx.fillRect(0,880,1024,30);ctx.fillStyle='#f6e4e5';ctx.fillRect(0,917,1024,21);
+  const texture=new THREE.CanvasTexture(c);texture.colorSpace=THREE.SRGBColorSpace;texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());return texture;
+}
 function crystalGeometry(radius,height){const shape=new THREE.Shape();for(let i=0;i<6;i++){const a=i/6*Math.PI*2; i?shape.lineTo(Math.cos(a)*radius,Math.sin(a)*radius):shape.moveTo(Math.cos(a)*radius,Math.sin(a)*radius)}shape.closePath();const g=new THREE.BufferGeometry(),v=[],n=6;let base=-height/2,shoulder=height*.29,tip=height/2;for(let i=0;i<n;i++){let a=i/n*Math.PI*2,b=(i+1)/n*Math.PI*2,p=[Math.cos(a)*radius,base,Math.sin(a)*radius],q=[Math.cos(b)*radius,base,Math.sin(b)*radius],u=[p[0],shoulder,p[2]],w=[q[0],shoulder,q[2]];v.push(...p,...q,...u,...q,...w,...u,...u,...w,0,tip,0,0,base,0,...q,...p)}g.setAttribute('position',new THREE.Float32BufferAttribute(v,3));g.computeVertexNormals();return g;}
 function mesh(geometry,material,parent=scene){const m=new THREE.Mesh(geometry,material);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m;}
 function floater(object,speed=.6,amp=.09){animated.push({object,speed,amp,y:object.position.y,phase:animated.length*1.7});return object;}
@@ -19,16 +32,29 @@ const chrome=new THREE.MeshPhysicalMaterial({color:0xe9d9df,metalness:1,roughnes
 const gold=new THREE.MeshStandardMaterial({color:0xb28b75,metalness:.92,roughness:.24});const ivory=new THREE.MeshPhysicalMaterial({color:0xf1e9e3,roughness:.22,clearcoat:.7});
 const floor=mesh(new THREE.CylinderGeometry(2.65,2.75,.13,96),new THREE.MeshStandardMaterial({color:0xd8c5bc,roughness:.7,metalness:.04}));floor.position.set(.1,-1.56,-.15);floor.scale.z=.67;floor.receiveShadow=true;
 let shadow=mesh(new THREE.PlaneGeometry(20,20),new THREE.ShadowMaterial({opacity:.16}));shadow.rotation.x=-Math.PI/2;shadow.position.y=-1.645;
-const bottle=new THREE.Group();scene.add(bottle);bottle.position.set(.2,.05,0);bottle.rotation.set(.04,.06,-.13);
-const body=mesh(new THREE.CylinderGeometry(.59,.63,1.7,64,1,false),rose,bottle);body.position.y=.12;
-const base=mesh(new THREE.TorusGeometry(.53,.09,16,64),rose,bottle);base.rotation.x=Math.PI/2;base.position.y=-.7;
-const shoulder=mesh(new THREE.SphereGeometry(.59,48,24),rose,bottle);shoulder.scale.set(1,.43,1);shoulder.position.y=.97;
-const neck=mesh(new THREE.CylinderGeometry(.23,.29,.24,40),rose,bottle);neck.position.y=1.17;
-const collar=mesh(new THREE.CylinderGeometry(.25,.25,.36,48),gold,bottle);collar.position.y=1.43;
-const rimRing=mesh(new THREE.TorusGeometry(.247,.025,12,48),gold,bottle);rimRing.rotation.x=Math.PI/2;rimRing.position.y=1.28;
-const dropper=mesh(new THREE.CapsuleGeometry(.16,.38,8,32),ivory,bottle);dropper.position.y=1.84;
-const pipette=mesh(new THREE.CylinderGeometry(.028,.028,1.65,12),clear,bottle);pipette.position.y=.28;
-let label=mesh(new THREE.PlaneGeometry(.83,.83),new THREE.MeshBasicMaterial({map:labelTexture(),transparent:true,depthWrite:false}),bottle);label.position.set(0,.11,.608);label.rotation.x=-.01;
+// Reference-inspired clear cylindrical serum bottle, broad white cap and curved label.
+const bottle=new THREE.Group();scene.add(bottle);bottle.position.set(.14,-.03,0);bottle.rotation.set(.025,.04,-.19);
+const glass=new THREE.MeshPhysicalMaterial({color:0xffeee7,metalness:0,roughness:.045,transmission:0,transparent:true,opacity:.34,depthWrite:false,thickness:.12,ior:1.49,clearcoat:1,clearcoatRoughness:.04,envMapIntensity:.9});
+const liquid=new THREE.MeshPhysicalMaterial({color:0xe8b2a1,roughness:.07,transmission:0,transparent:true,opacity:.4,depthWrite:false,thickness:.85,ior:1.335,clearcoat:.3,envMapIntensity:.55});
+const whiteCap=new THREE.MeshPhysicalMaterial({color:0xfffcf7,roughness:.24,metalness:0,clearcoat:.7,clearcoatRoughness:.13});
+const rubber=new THREE.MeshPhysicalMaterial({color:0xfffdf9,roughness:.4,clearcoat:.22});
+const profile=[ [0,-1.03],[.48,-1.03],[.57,-1.01],[.615,-.97],[.635,-.91],[.64,-.8],[.64,.63],[.635,.73],[.62,.79],[.57,.83],[.46,.865],[.34,.895],[.31,.94],[.31,1.02],[.28,1.06],[0,1.06] ].map(([r,y])=>new THREE.Vector2(r,y));
+mesh(new THREE.LatheGeometry(profile,96),glass,bottle);
+const contents=mesh(new THREE.CylinderGeometry(.576,.576,1.54,64),liquid,bottle);contents.position.y=-.115;
+const meniscus=mesh(new THREE.SphereGeometry(.576,48,16),liquid,bottle);meniscus.position.y=.655;meniscus.scale.y=.025;
+const bottomGlass=mesh(new THREE.TorusGeometry(.555,.065,12,72),glass,bottle);bottomGlass.rotation.x=Math.PI/2;bottomGlass.position.y=-.956;
+for(const y of [.91,.98]){const thread=mesh(new THREE.TorusGeometry(.314,.021,10,64),glass,bottle);thread.rotation.x=Math.PI/2;thread.position.y=y;}
+const cap=mesh(new THREE.CylinderGeometry(.385,.39,.66,72),whiteCap,bottle);cap.position.y=1.325;
+const capTop=mesh(new THREE.TorusGeometry(.368,.02,10,72),whiteCap,bottle);capTop.rotation.x=Math.PI/2;capTop.position.y=1.651;
+const capBottom=mesh(new THREE.TorusGeometry(.378,.017,10,72),whiteCap,bottle);capBottom.rotation.x=Math.PI/2;capBottom.position.y=1.003;
+const bulb=mesh(new THREE.CapsuleGeometry(.196,.40,12,48),rubber,bottle);bulb.position.set(0,1.96,0);
+const bulbBase=mesh(new THREE.CylinderGeometry(.23,.275,.13,48),rubber,bottle);bulbBase.position.y=1.68;
+const pipette=mesh(new THREE.CylinderGeometry(.026,.026,1.65,16),glass,bottle);pipette.position.y=.02;
+const pipetteTip=mesh(new THREE.SphereGeometry(.027,16,12),glass,bottle);pipetteTip.position.y=-.807;pipetteTip.scale.y=1.6;
+const wrap=mesh(new THREE.CylinderGeometry(.644,.644,1.34,96,1,true,-Math.PI*.38,Math.PI*.76),new THREE.MeshBasicMaterial({map:labelTexture(),side:THREE.DoubleSide,toneMapped:false}),bottle);wrap.position.y=-.08;wrap.castShadow=false;
+// Narrow glints along the curved glass make the transparent wall legible.
+const glintMaterial=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.32,depthWrite:false,side:THREE.DoubleSide});
+for(const [angle,width] of [[-.90,.045],[.96,.025]]){const glint=mesh(new THREE.CylinderGeometry(.643,.643,1.82,48,1,true,angle,width),glintMaterial,bottle);glint.position.y=-.04;glint.castShadow=false;}
 floater(bottle,.52,.065);
 const cluster=new THREE.Group();cluster.position.set(-1.65,-1.03,.35);cluster.rotation.set(0,.5,-.12);scene.add(cluster);for(let i=0;i<6;i++){let r=.16+(i%3)*.035,h=.7+(i%3)*.34;let c=mesh(crystalGeometry(r,h),i%2?quartz:clear,cluster);c.position.set(Math.cos(i*2.2)*.32,h/2-.43,Math.sin(i*2.2)*.3);c.rotation.set(i%2*.17,i*.3,(i-2)*.08)}
 const amethyst=new THREE.Group();amethyst.position.set(1.7,-1.15,.65);scene.add(amethyst);for(let i=0;i<12;i++){let h=.24+(Math.sin(i*2.5)+1)*.2;let c=mesh(crystalGeometry(.16,h),i%3?lavender:quartz,amethyst);c.position.set(Math.cos(i*2.4)*(i%3)*.2,h/2-.3,Math.sin(i*2.4)*(i%3)*.2);c.rotation.set(.3*Math.sin(i),i*.6,.3*Math.cos(i))}
