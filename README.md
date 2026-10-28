@@ -2,6 +2,10 @@
 
 A responsive, Vietnamese TikTok Shop creative tracker for e-commerce performance marketing.
 
+Live: https://minhkhanh6304-ai.github.io/Omni_Web/
+
+The crystal studio theme includes a locally bundled Three.js scene with rose glass, quartz, reflective spheres, pointer parallax and floating glass cards. Motion can be paused, respects reduced-motion preferences and stops rendering when the scene is off screen. Devices without WebGL retain a CSS illustration and the fully usable tracker. Three.js is distributed under its MIT license in `vendor/THREE-LICENSE.txt`.
+
 ## Features
 
 - Track videos, KOC/KOL creators, shop products, content pillars and angles.
